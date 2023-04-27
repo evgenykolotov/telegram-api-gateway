@@ -1,0 +1,79 @@
+name: Выкладка исходного кода на сервер
+
+on:
+  pull_request:
+    branches: [main]
+    types: [closed]
+
+jobs:
+  eslint:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    container:
+      image: node:18.16
+    steps:
+      - uses: actions/checkout@v3
+      - name: Кэширование NodeJS модулей
+        uses: actions/cache@v3
+        env:
+          cache-name: npm-${{ hashFiles('package-lock.json') }}
+        with:
+          path: ~/.npm
+          key: ${{ env.cache-name }}
+          restore-keys: ${{ env.cache-name }}
+      - name: Установка npm зависимостей
+        run: npm install
+      - name: Линтинг исходного кода с ESLint
+        run: npm run lint
+
+  test:
+    if: github.event.pull_request.merged == true
+    needs: eslint
+    runs-on: ubuntu-latest
+    container:
+      image: node:18.16
+    steps:
+      - uses: actions/checkout@v3
+      - name: Кэширование NodeJS модулей
+        uses: actions/cache@v3
+        env:
+          cache-name: npm-${{ hashFiles('package-lock.json') }}
+        with:
+          path: ~/.npm
+          key: ${{ env.cache-name }}
+          restore-keys: ${{ env.cache-name }}
+      - name: Установка npm зависимостей
+        run: npm install
+      - name: Тестирование исходного кода
+        run: npm run test
+
+  deploy:
+    if: github.event.pull_request.merged == true
+    needs: [eslint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Установка SSH ключей
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+      - name: Копирование файлов на сервер
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_HOSTNAME }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          rm: true
+          source: "./*"
+          target: "~/telegram-api-gateway"
+      - name: Выполнение удаленных команд SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOSTNAME }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd $HOME/telegram-api-gateway
+            ls -a
