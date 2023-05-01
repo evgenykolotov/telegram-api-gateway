@@ -76,4 +76,4 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd $HOME/telegram-api-gateway
-            ls -a
+            docker-compose -f docker-compose.production.yml up -d --build
