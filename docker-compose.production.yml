@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  api_gateway:
+    build:
+      context: .
+      dockerfile: ./Dockerfile-production
+    container_name: api_gateway
+    ports:
+      - "3000:3000"
+    networks:
+      - backend_production
+    restart: always
+
+networks:
+  backend_production:
+    name: telegram_network
