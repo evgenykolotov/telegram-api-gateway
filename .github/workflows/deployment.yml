@@ -1,16 +1,13 @@
 name: Выкладка исходного кода на сервер
 
 on:
-  push:
-    branches: [main]
-
   pull_request:
     branches: [main]
     types: [closed]
 
 jobs:
   eslint:
-#    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     container:
       image: node:18.16
@@ -30,7 +27,7 @@ jobs:
         run: npm run lint
 
   test:
-#    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     needs: eslint
     runs-on: ubuntu-latest
     container:
@@ -51,7 +48,7 @@ jobs:
         run: npm run test
 
   deploy:
-#    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     needs: [eslint, test]
     runs-on: ubuntu-latest
     steps:
