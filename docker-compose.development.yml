@@ -12,3 +12,23 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+    networks:
+      - backend_development
+    depends_on:
+      - rmq
+
+  rmq:
+    container_name: rmq
+    image: rabbitmq:3-management
+    env_file:
+      - environment/.development.env
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    restart: always
+    networks:
+      - backend_development
+
+networks:
+  backend_development:
+    name: telegram_network
