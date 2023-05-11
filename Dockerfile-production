@@ -10,4 +10,5 @@ WORKDIR /app
 ADD package*.json ./
 RUN npm install --only=prod --ignore-scripts
 COPY --from=build /app/dist ./dist
+COPY environment /app/environment
 CMD ["npm", "run", "start:prod"]
