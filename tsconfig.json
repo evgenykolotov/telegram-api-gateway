@@ -12,6 +12,9 @@
     "baseUrl": "./",
     "strict": true,
     "incremental": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "@config/*": ["./configs/*"],
+    }
   }
 }
