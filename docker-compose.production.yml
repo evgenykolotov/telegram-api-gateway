@@ -11,6 +11,20 @@ services:
     networks:
       - backend_production
     restart: always
+    depends_on:
+      - rmq
+
+  rmq:
+    container_name: rmq
+    image: rabbitmq:3-management
+    env_file:
+      - environment/.production.env
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    restart: always
+    networks:
+      - backend_production
 
 networks:
   backend_production:
