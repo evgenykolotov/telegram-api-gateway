@@ -1,13 +1,16 @@
 name: Выкладка исходного кода на сервер
 
 on:
+  push:
+    branches: [main]
+
   pull_request:
     branches: [main]
     types: [closed]
 
 jobs:
   eslint:
-    if: github.event.pull_request.merged == true
+#    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     container:
       image: node:18.16
@@ -27,7 +30,7 @@ jobs:
         run: npm run lint
 
   test:
-    if: github.event.pull_request.merged == true
+#    if: github.event.pull_request.merged == true
     needs: eslint
     runs-on: ubuntu-latest
     container:
@@ -48,7 +51,7 @@ jobs:
         run: npm run test
 
   deploy:
-    if: github.event.pull_request.merged == true
+#    if: github.event.pull_request.merged == true
     needs: [eslint, test]
     runs-on: ubuntu-latest
     steps:
@@ -76,16 +79,10 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd $HOME/telegram-api-gateway
-            touch environment/.production.env
-            echo "$RABBITMQ_DEFAULT_USER" >> environment/.production.env
-            echo "$RABBITMQ_DEFAULT_PASS" >> environment/.production.env
-            echo "$RABBITMQ_DEFAULT_HOSTNAME" >> environment/.production.env
-            echo "$RABBITMQ_DEFAULT_EXCHANGE" >> environment/.production.env
-            echo "$RABBITMQ_DEFAULT_QUEUE" >> environment/.production.env
+            mkdir environment
+            echo RABBITMQ_DEFAULT_USER=${{ secrets.RABBITMQ_DEFAULT_USER }} >> environment/.production.env
+            echo RABBITMQ_DEFAULT_PASS=${{ secrets.RABBITMQ_DEFAULT_PASS }} >> environment/.production.env
+            echo RABBITMQ_DEFAULT_HOSTNAME=${{ secrets.RABBITMQ_DEFAULT_HOSTNAME }} >> environment/.production.env
+            echo RABBITMQ_DEFAULT_EXCHANGE=${{ secrets.RABBITMQ_DEFAULT_EXCHANGE }} >> environment/.production.env
+            echo RABBITMQ_DEFAULT_QUEUE=${{ secrets.RABBITMQ_DEFAULT_QUEUE }} >> environment/.production.env
             docker-compose -f docker-compose.production.yml up -d --build
-          env:
-            RABBITMQ_DEFAULT_USER: ${{ secrets.RABBITMQ_DEFAULT_USER }}
-            RABBITMQ_DEFAULT_PASS: ${{ secrets.RABBITMQ_DEFAULT_PASS }}
-            RABBITMQ_DEFAULT_HOSTNAME: ${{ secrets.RABBITMQ_DEFAULT_HOSTNAME }}
-            RABBITMQ_DEFAULT_EXCHANGE: ${{ secrets.RABBITMQ_DEFAULT_EXCHANGE }}
-            RABBITMQ_DEFAULT_QUEUE: ${{ secrets.RABBITMQ_DEFAULT_QUEUE }}
