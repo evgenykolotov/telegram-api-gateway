@@ -1,10 +1,16 @@
+import { Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
+import { getRMQConfig } from '@config/rmq.config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap(): Promise<void> {
 	/** Создание NestJS приложения */
 	const app = await NestFactory.create(AppModule);
+
+	/** Подключение к RabbitMQ accounts service */
+	app.connectMicroservice(getRMQConfig());
+	await app.startAllMicroservices();
 
 	/** Конфигурирование пакета Swagger */
 	const config = new DocumentBuilder()
@@ -14,7 +20,7 @@ async function bootstrap(): Promise<void> {
 		.build();
 
 	/** Создание документа SwaggerModule */
-	const document = SwaggerModule.createDocument(app, config);
+	const document = SwaggerModule.createDocument(app, config, {});
 
 	/** Генерация страницы с OpenAPI */
 	SwaggerModule.setup('/api/swagger', app, document);
@@ -23,4 +29,4 @@ async function bootstrap(): Promise<void> {
 	await app.listen(3000);
 }
 
-bootstrap();
+bootstrap().then(() => Logger.log('🚀 Telegram-api-gateway microservice is running on port: 3000'));
