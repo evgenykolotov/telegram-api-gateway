@@ -16,7 +16,7 @@ async function bootstrap(): Promise<void> {
 	const config = new DocumentBuilder()
 		.setTitle('Telegram API Gateway')
 		.setDescription('OpenAPI for Telegram Application')
-		.setVersion('1.2.0')
+		.setVersion('1.3.1')
 		.build();
 
 	/** Создание документа SwaggerModule */
