@@ -80,6 +80,5 @@ jobs:
             echo RABBITMQ_DEFAULT_USER=${{ secrets.RABBITMQ_DEFAULT_USER }} >> environment/.production.env
             echo RABBITMQ_DEFAULT_PASS=${{ secrets.RABBITMQ_DEFAULT_PASS }} >> environment/.production.env
             echo RABBITMQ_DEFAULT_HOSTNAME=${{ secrets.RABBITMQ_DEFAULT_HOSTNAME }} >> environment/.production.env
-            echo RABBITMQ_DEFAULT_EXCHANGE=${{ secrets.RABBITMQ_DEFAULT_EXCHANGE }} >> environment/.production.env
             echo RABBITMQ_DEFAULT_QUEUE=${{ secrets.RABBITMQ_DEFAULT_QUEUE }} >> environment/.production.env
             docker-compose -f docker-compose.production.yml up -d --build
