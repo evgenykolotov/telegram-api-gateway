@@ -1,20 +1,17 @@
-import { IRMQServiceAsyncOptions } from 'nestjs-rmq';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
-export const getRMQConfig = (): IRMQServiceAsyncOptions => ({
-	inject: [ConfigService],
-	imports: [ConfigModule],
-	useFactory: (configService: ConfigService) => ({
-		exchangeName: configService.get('RABBITMQ_DEFAULT_EXCHANGE') ?? '',
-		connections: [
+export const getRMQConfig = (): MicroserviceOptions => ({
+	transport: Transport.RMQ,
+	options: {
+		urls: [
 			{
-				login: configService.get('RABBITMQ_DEFAULT_USER') ?? '',
-				password: configService.get('RABBITMQ_DEFAULT_PASS') ?? '',
-				host: configService.get('RABBITMQ_DEFAULT_HOSTNAME') ?? '',
+				hostname: process.env.RABBITMQ_DEFAULT_HOSTNAME,
+				username: process.env.RABBITMQ_DEFAULT_USER,
+				password: process.env.RABBITMQ_DEFAULT_PASS,
 			},
 		],
-		queueName: configService.get('RABBITMQ_DEFAULT_QUEUE') ?? '',
+		queue: process.env.RABBITMQ_DEFAULT_QUEUE,
+		queueOptions: { durable: true },
 		prefetchCount: 32,
-		serviceName: 'telegram-api-gateway',
-	}),
+	},
 });
