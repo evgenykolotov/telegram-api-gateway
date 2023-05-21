@@ -37,7 +37,6 @@
     "amqp-connection-manager": "^4.1.13",
     "amqplib": "^0.10.3",
     "cross-env": "^7.0.3",
-    "nestjs-rmq": "^2.8.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0"
   },
